@@ -1,0 +1,26 @@
+import mysql.connector  #importando biblioteca sql
+
+def cria_conexao():
+    conexao = mysql.connector.connect(user = 'root',                #conexão com o sql
+                                      password = 'Dodsf1255',
+                                      host = 'localhost',
+                                   database = 'db_produto')
+
+    print("Conexão:", conexao)
+    cursor = conexao.cursor()
+    #sql = "CREATE DATABASE db_produto"  #criando o database produto
+    #cursor.execute(sql)
+    #cursor.close()
+    #conexao.close()
+
+def cria_tabela():
+
+    #sql = ''' CREATE TABLE tb_produto(
+    #          preço INT,
+    #          nome VARCHAR(45) NOT NULL,
+    #          PRIMARY KEY (preço)
+    #    ) '''
+
+    #cursor.execute(sql)
+    #cursor.close()
+    #conexao.close()
