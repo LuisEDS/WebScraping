@@ -4,12 +4,13 @@ import mysql.connector
 from bs4 import BeautifulSoup
 import requests
 import datetime
+import re
 
 # função usada para fazer a conexão, criar o banco de dados e realizar o scrap.
 def main():
     conexao = mysql.connector.connect(
         user='root',
-        password='Dodsf1255',
+        password='',
         host='localhost',
         database='db_produto')              #apos criar o database lembrar de colocar entre as aspas simples na linha 14! Ex: database = 'db_exemplo'.
     print("Conexão:", conexao)
@@ -58,11 +59,9 @@ def cria_tabela(cursor):   #criação das tabelas no MySql.
 
 def scrap(cursor, conexao):  #função utilizada para realizar a raspagem de dados.
     URLS = [
-        "https://www.kabum.com.br/produto/109012/monitor-gamer-asus-23-8-ips-wide-144-hz-full-hd-1ms-adaptive-sync-hdmi-displayport-vesa-som-integrado-vp249qgr",
-        "https://www.kabum.com.br/produto/170796/monitor-philips-led-27-1920-x-1080-wide-vesa-preto-multimidia",
-        "https://www.kabum.com.br/produto/112349/monitor-gamer-samsung-odyssey-27-led-curvo-wide-240-hz-full-hd-g-sync-hdmi-displayport-lc27rg50fqlxzd",
-        "https://www.kabum.com.br/produto/170787/monitor-led-philips-23-8-242v8a-full-hd-hdmi-vga-ips",
-        "https://www.kabum.com.br/produto/232006/monitor-led-21-5-philips-full-hd-com-3-000-1-de-contraste-branco-bivolt-221v8lw"]
+        'https://www.pichau.com.br/ssd-mancer-blink-x-512gb-sata-iii-6gb-s-leitura-530-mb-s-gravacao-480-mb-s-mcr-blkx1-512',
+        'https://www.pichau.com.br/gabinete-gamer-mancer-crusader-mid-tower-lateral-de-vidro-com-1-fan-preto-mcr-csd-bk01',
+        'https://www.pichau.com.br/monitor-gamer-pichau-cepheus-vpro24-24-5-pol-ips-fhd-1ms-360hz-freesync-pg-cfvpro24-bl01']
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.67 Safari/537.36 OPR/87.0.4390.58"}
 
@@ -70,8 +69,11 @@ def scrap(cursor, conexao):  #função utilizada para realizar a raspagem de dad
         site = requests.get(URL, headers=headers)
         soup = BeautifulSoup(site.content, 'html.parser')
 
-        title = soup.find("h1", itemprop="name").get_text()
-        price = soup.find("h4", itemprop="price").get_text().strip()
+        title = soup.find("h1").get_text()
+
+        prices = soup.find_all('div')
+        price_tag = [p for p in prices if 'R$' in p][0]
+        price = re.search(r'\d{3}\.\d{2}', str(price_tag)).group(0)
 
         produtos = get_prod_por_nome(title, cursor)
 
